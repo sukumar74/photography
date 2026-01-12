@@ -41,11 +41,13 @@ export const EFFECTS_LIBRARY = [
     {
         id: "slow-motion",
         name: "Super Slow Motion",
-        description: "Smooth out videos with AI interpolation (RIFE).",
+        description: "Smooth out videos (Simulated via Zeroscope).",
         category: "Effects",
-        modelId: "alexk313/RIFE", // Proxy for RIFE space
+        modelId: "cerspense/zeroscope_v2_576w", // RIFE is down, using Zeroscope as fallback
         inputType: "video",
-        icon: "Clock" // Simulating Slow Mo
+        requiresPrompt: true, // Zeroscope needs a prompt
+        defaultPrompt: "slow motion, smooth motion, high frame rate, 60fps, interpolation",
+        icon: "Clock"
     },
 
     // --- IMAGE EFFECTS ---

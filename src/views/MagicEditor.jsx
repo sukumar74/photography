@@ -29,20 +29,26 @@ export default function MagicEditor({ effect }) {
         setError(null);
         try {
             let inputs = [];
-            // Construct inputs based on effect type and common Gradio patterns
-            if (effect.inputType === 'text') {
-                inputs = [prompt, Math.random(), true, 1024, 1024, 4]; // FLUX pattern
-            } else if (effect.inputType === 'image') {
-                // Img2Vid usually takes (image, seed, ...)
-                if (effect.id === 'image-to-video') {
-                    inputs = [inputData, Math.random()]; // SVD pattern
-                } else {
-                    // Remove BG, Upscale etc usually just take the image
-                    inputs = [inputData];
-                }
-            } else if (effect.inputType === 'video') {
-                // Zeroscope (video, prompt, seed)
+
+            // 1. Text to Image (FLUX.1)
+            if (effect.id === 'text-to-image') {
+                inputs = [prompt, Math.random(), true, 1024, 1024, 4];
+            }
+            // 2. Text to Video (ModelScope) - Does NOT want width/height
+            else if (effect.id === 'text-to-video') {
+                inputs = [prompt, Math.random()];
+            }
+            // 3. Image to Video (SVD)
+            else if (effect.id === 'image-to-video') {
+                inputs = [inputData, Math.random(), 25, 127, 6, 0.02]; // Standard SVD params: [img, seed, frames, bucket, fps, noise]
+            }
+            // 4. Video to Video (Zeroscope)
+            else if (effect.inputType === 'video' || effect.id === 'slow-motion') {
                 inputs = [inputData, prompt, Math.random()];
+            }
+            // 5. Other Image Effects (Remove BG, Upscale)
+            else {
+                inputs = [inputData];
             }
 
             const response = await predict("/infer", inputs).catch(async () => {

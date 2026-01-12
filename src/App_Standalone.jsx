@@ -38,10 +38,12 @@ const EFFECTS_LIBRARY = [
     {
         id: "slow-motion",
         name: "Super Slow Motion",
-        description: "Smooth out videos with AI interpolation (RIFE).",
+        description: "Smooth out videos (Simulated via Zeroscope).",
         category: "Effects",
-        modelId: "alexk313/RIFE",
+        modelId: "cerspense/zeroscope_v2_576w",
         inputType: "video",
+        requiresPrompt: true,
+        defaultPrompt: "slow motion, smooth motion, high frame rate, 60fps, interpolation",
         icon: "Clock"
     },
     {
@@ -179,13 +181,26 @@ function MagicEditor({ effect }) {
         setError(null);
         try {
             let inputs = [];
-            if (effect.inputType === 'text') {
+
+            // 1. Text to Image (FLUX.1)
+            if (effect.id === 'text-to-image') {
                 inputs = [prompt, Math.random(), true, 1024, 1024, 4];
-            } else if (effect.inputType === 'image') {
-                if (effect.id === 'image-to-video') inputs = [inputData, Math.random()];
-                else inputs = [inputData];
-            } else if (effect.inputType === 'video') {
+            }
+            // 2. Text to Video (ModelScope)
+            else if (effect.id === 'text-to-video') {
+                inputs = [prompt, Math.random()];
+            }
+            // 3. Image to Video (SVD)
+            else if (effect.id === 'image-to-video') {
+                inputs = [inputData, Math.random(), 25, 127, 6, 0.02];
+            }
+            // 4. Video to Video (Zeroscope / Slow Motion)
+            else if (effect.inputType === 'video' || effect.id === 'slow-motion') {
                 inputs = [inputData, prompt, Math.random()];
+            }
+            // 5. General Image Ops
+            else {
+                inputs = [inputData];
             }
 
             const response = await predict("/infer", inputs).catch(async () => await predict("/predict", inputs));
