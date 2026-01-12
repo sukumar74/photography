@@ -9,10 +9,10 @@ const CONFIG = {
 const EFFECTS_LIBRARY = [
     {
         id: "text-to-video",
-        name: "Text to Video",
-        description: "Generate video from text prompts.",
+        name: "Text to Video (Turbo)",
+        description: "Generate video FAST (AnimateDiff Lightning).",
         category: "Generation",
-        modelId: "damo-vilab/modelscope-text-to-video-synthesis",
+        modelId: "ByteDance/AnimateDiff-Lightning",
         inputType: "text",
         icon: "Film"
     },
@@ -21,7 +21,7 @@ const EFFECTS_LIBRARY = [
         name: "Image to Video",
         description: "Bring still photos to life.",
         category: "Generation",
-        modelId: "stabilityai/stable-video-diffusion",
+        modelId: "multimodalart/stable-video-diffusion",
         inputType: "image",
         icon: "ImagePlay"
     },
