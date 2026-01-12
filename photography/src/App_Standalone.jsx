@@ -10,9 +10,9 @@ const EFFECTS_LIBRARY = [
     {
         id: "text-to-video",
         name: "Text to Video",
-        description: "Generate video from text prompts.",
+        description: "Generate video FAST (AnimateDiff Lightning).",
         category: "Generation",
-        modelId: "damo-vilab/modelscope-text-to-video-synthesis",
+        modelId: "ByteDance/AnimateDiff-Lightning",
         inputType: "text",
         icon: "Film"
     },
@@ -21,29 +21,19 @@ const EFFECTS_LIBRARY = [
         name: "Image to Video",
         description: "Bring still photos to life.",
         category: "Generation",
-        modelId: "multimodalart/stable-video-diffusion",
+        modelId: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
         inputType: "image",
         icon: "ImagePlay"
     },
     {
-        id: "video-style-transfer",
-        name: "Video Styles",
-        description: "Apply styles (Anime, Cyberpunk) to videos.",
-        category: "Effects",
-        modelId: "cerspense/zeroscope_v2_576w",
-        inputType: "video",
-        requiresPrompt: true,
-        icon: "Wand2"
-    },
-    {
         id: "slow-motion",
         name: "Super Slow Motion",
-        description: "Smooth out videos (Simulated via Zeroscope).",
+        description: "Smooth out videos (Zeroscope V2).",
         category: "Effects",
         modelId: "cerspense/zeroscope_v2_576w",
         inputType: "video",
         requiresPrompt: true,
-        defaultPrompt: "slow motion, smooth motion, high frame rate, 60fps, interpolation",
+        defaultPrompt: "slow motion, smooth, high frame rate",
         icon: "Clock"
     },
     {
@@ -111,20 +101,18 @@ function useHuggingFace(spaceId) {
 
     useEffect(() => {
         let mounted = true;
-        let timeout;
+        let t1, t2, t3;
 
         async function connect() {
             setStatus('loading');
-            setStatusMessage('Connecting to AI...');
+            setStatusMessage('Connecting to AI Hub...');
 
-            // If it takes more than 5 seconds, it's likely waking up
-            timeout = setTimeout(() => {
-                if (mounted) setStatusMessage('Waking up the AI model (this can take 3 minutes)...');
-            }, 5000);
+            t1 = setTimeout(() => { if (mounted) setStatusMessage('Waking up the AI model... (1/3)'); }, 5000);
+            t2 = setTimeout(() => { if (mounted) setStatusMessage('Still waking up... (2/3)'); }, 45000);
+            t3 = setTimeout(() => { if (mounted) setStatusMessage('Hugging Face is busy. Try refreshing if it hangs >3 mins.'); }, 120000);
 
             try {
                 if (!spaceId) return;
-                console.log("Connecting to space:", spaceId);
                 const c = await Client.connect(spaceId);
                 if (mounted) {
                     setClient(c);
@@ -132,18 +120,18 @@ function useHuggingFace(spaceId) {
                     setStatusMessage('');
                 }
             } catch (err) {
-                console.error("Failed to connect:", spaceId, err);
+                console.error("Connection error:", spaceId, err);
                 if (mounted) {
                     setError(err.message || String(err));
                     setStatus('error');
-                    setStatusMessage('Failed to connect. The space might be private or offline.');
+                    setStatusMessage('Connection failed. Model may be private or down.');
                 }
             }
         }
         connect();
         return () => {
             mounted = false;
-            clearTimeout(timeout);
+            clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
         };
     }, [spaceId]);
 
@@ -186,34 +174,36 @@ function MagicEditor({ effect }) {
             if (effect.id === 'text-to-image') {
                 inputs = [prompt, Math.random(), true, 1024, 1024, 4];
             }
-            // 2. Text to Video (ModelScope)
+            // 2. Text to Video
             else if (effect.id === 'text-to-video') {
                 inputs = [prompt, Math.random()];
             }
-            // 3. Image to Video (SVD)
+            // 3. Image to Video
             else if (effect.id === 'image-to-video') {
                 inputs = [inputData, Math.random(), 25, 127, 6, 0.02];
             }
-            // 4. Video to Video (Zeroscope / Slow Motion)
+            // 4. Video to Video / Slow Motion
             else if (effect.inputType === 'video' || effect.id === 'slow-motion') {
                 inputs = [inputData, prompt, Math.random()];
             }
-            // 5. General Image Ops
             else {
                 inputs = [inputData];
             }
 
-            const response = await predict("/infer", inputs).catch(async () => await predict("/predict", inputs));
+            // More robust prediction with endpoint fallback
+            const response = await predict("/infer", inputs)
+                .catch(async () => await predict("/predict", inputs))
+                .catch(async () => await predict(0, inputs));
 
             if (response && response.data && response.data[0]) {
                 const data = response.data[0];
                 setResult(data.url || data.video || data.image || data);
             } else {
-                setError("Unexpected response format.");
+                setError("AI returned an empty result. Try a different prompt.");
             }
         } catch (err) {
             console.error(err);
-            setError("Failed to run. Model might be busy. Try again.");
+            setError("Failed to run. Model might be offline or busy.");
         } finally {
             setLoading(false);
         }

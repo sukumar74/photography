@@ -34,19 +34,21 @@ export default function MagicEditor({ effect }) {
             if (effect.id === 'text-to-image') {
                 inputs = [prompt, Math.random(), true, 1024, 1024, 4];
             }
-            // 2. Text to Video (ModelScope) - Does NOT want width/height
+            // 2. Text to Video (Lightning / ModelScope)
             else if (effect.id === 'text-to-video') {
+                // Lightning often expects (prompt, negative_prompt, seed, steps, cfg)
+                // But for a generic catch-all, we try prompt + seed first
                 inputs = [prompt, Math.random()];
             }
-            // 3. Image to Video (SVD)
+            // 3. Image to Video (SVD-XT)
             else if (effect.id === 'image-to-video') {
-                inputs = [inputData, Math.random(), 25, 127, 6, 0.02]; // Standard SVD params: [img, seed, frames, bucket, fps, noise]
+                inputs = [inputData, Math.random(), 25, 127, 6, 0.02];
             }
-            // 4. Video to Video (Zeroscope)
+            // 4. Video to Video (Zeroscope / Slow Motion)
             else if (effect.inputType === 'video' || effect.id === 'slow-motion') {
                 inputs = [inputData, prompt, Math.random()];
             }
-            // 5. Other Image Effects (Remove BG, Upscale)
+            // 5. Other Image Effects
             else {
                 inputs = [inputData];
             }

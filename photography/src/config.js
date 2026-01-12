@@ -11,9 +11,9 @@ export const EFFECTS_LIBRARY = [
     {
         id: "text-to-video",
         name: "Text to Video",
-        description: "Generate video from text prompts.",
+        description: "Generate video FAST (AnimateDiff Lightning).",
         category: "Generation",
-        modelId: "damo-vilab/modelscope-text-to-video-synthesis",
+        modelId: "ByteDance/AnimateDiff-Lightning",
         inputType: "text",
         icon: "Film"
     },
@@ -22,31 +22,19 @@ export const EFFECTS_LIBRARY = [
         name: "Image to Video",
         description: "Bring still photos to life.",
         category: "Generation",
-        modelId: "multimodalart/stable-video-diffusion",
+        modelId: "stabilityai/stable-video-diffusion-img2vid-xt-1-1",
         inputType: "image",
         icon: "ImagePlay"
-    },
-
-    // --- VIDEO EFFECTS (Vid2Vid) ---
-    {
-        id: "video-style-transfer",
-        name: "Video Styles",
-        description: "Apply styles (Anime, Cyberpunk) to videos.",
-        category: "Effects",
-        modelId: "cerspense/zeroscope_v2_576w", // Using zeroscope as a general vid2vid proxy
-        inputType: "video",
-        requiresPrompt: true,
-        icon: "Wand2"
     },
     {
         id: "slow-motion",
         name: "Super Slow Motion",
-        description: "Smooth out videos (Simulated via Zeroscope).",
+        description: "Smooth out videos (Zeroscope V2).",
         category: "Effects",
-        modelId: "cerspense/zeroscope_v2_576w", // RIFE is down, using Zeroscope as fallback
+        modelId: "cerspense/zeroscope_v2_576w",
         inputType: "video",
-        requiresPrompt: true, // Zeroscope needs a prompt
-        defaultPrompt: "slow motion, smooth motion, high frame rate, 60fps, interpolation",
+        requiresPrompt: true,
+        defaultPrompt: "slow motion, smooth, high frame rate",
         icon: "Clock"
     },
 

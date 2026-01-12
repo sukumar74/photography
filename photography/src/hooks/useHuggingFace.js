@@ -9,20 +9,19 @@ export function useHuggingFace(spaceId) {
 
     useEffect(() => {
         let mounted = true;
-        let timeout;
+        let t1, t2, t3;
 
         async function connect() {
             setStatus('loading');
-            setStatusMessage('Connecting to AI...');
+            setStatusMessage('Connecting to AI Hub...');
 
-            // If it takes more than 5 seconds, it's likely waking up
-            timeout = setTimeout(() => {
-                if (mounted) setStatusMessage('Waking up the AI model (this can take 3 minutes)...');
-            }, 5000);
+            // Multi-stage feedback for long wait times
+            t1 = setTimeout(() => { if (mounted) setStatusMessage('Waking up the AI model... (1/3)'); }, 5000);
+            t2 = setTimeout(() => { if (mounted) setStatusMessage('Still waking up... (2/3)'); }, 45000);
+            t3 = setTimeout(() => { if (mounted) setStatusMessage('Almost there! (3/3) Running final checks...'); }, 120000);
 
             try {
                 if (!spaceId) return;
-                console.log("Connecting to space:", spaceId);
                 const c = await Client.connect(spaceId);
                 if (mounted) {
                     setClient(c);
@@ -30,18 +29,18 @@ export function useHuggingFace(spaceId) {
                     setStatusMessage('');
                 }
             } catch (err) {
-                console.error("Failed to connect to space:", spaceId, err);
+                console.error("Failed to connect:", spaceId, err);
                 if (mounted) {
-                    setError(err);
+                    setError(err.message || String(err));
                     setStatus('error');
-                    setStatusMessage('Failed to connect. The space might be private or offline.');
+                    setStatusMessage('Connection failed. Model might be offline.');
                 }
             }
         }
-        if (spaceId) connect();
+        connect();
         return () => {
             mounted = false;
-            clearTimeout(timeout);
+            clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
         };
     }, [spaceId]);
 
