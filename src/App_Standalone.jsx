@@ -241,7 +241,7 @@ function MagicEditor({ effect }) {
                     {status !== 'ready' && (
                         <div className="status-badge warn">
                             {statusMessage || 'Connecting...'}
-                            {statusMessage.includes('Waking') && <div className="loader-line"></div>}
+                            {statusMessage && statusMessage.includes('Waking') && <div className="loader-line"></div>}
                         </div>
                     )}
 
