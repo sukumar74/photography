@@ -125,8 +125,8 @@ export default function MagicEditor({ effect }) {
                     {/* Improved Status Display */}
                     {status !== 'ready' && (
                         <div className="status-badge warn">
-                            {statusMessage || 'Connecting...'}
-                            {statusMessage && statusMessage.includes('Waking') && <div className="loader-line"></div>}
+                            {statusMessage || 'System Connecting...'}
+                            {status === 'loading' && <div className="loader-line"></div>}
                         </div>
                     )}
                     {error && <div className="error-box"><AlertCircle size={16} /> {error}</div>}

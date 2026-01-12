@@ -12,28 +12,48 @@ export function useHuggingFace(spaceId) {
         let t1, t2, t3;
 
         async function connect() {
+            if (!spaceId) return;
+
+            console.log(`[AI Hook] Attempting connection to: ${spaceId}`);
             setStatus('loading');
-            setStatusMessage('Connecting to AI Hub...');
+            setStatusMessage('Initializing Hub Connection...');
 
             // Multi-stage feedback for long wait times
-            t1 = setTimeout(() => { if (mounted) setStatusMessage('Waking up the AI model... (1/3)'); }, 5000);
-            t2 = setTimeout(() => { if (mounted) setStatusMessage('Still waking up... (2/3)'); }, 45000);
-            t3 = setTimeout(() => { if (mounted) setStatusMessage('Almost there! (3/3) Running final checks...'); }, 120000);
+            t1 = setTimeout(() => {
+                if (mounted) {
+                    console.log("[AI Hook] Stage 1/3: Waking up");
+                    setStatusMessage('Waking up the AI model... (Stage 1/3)');
+                }
+            }, 5000);
+
+            t2 = setTimeout(() => {
+                if (mounted) {
+                    console.log("[AI Hook] Stage 2/3: Loading weights");
+                    setStatusMessage('Still waking up... Loading AI weights (Stage 2/3)');
+                }
+            }, 45000);
+
+            t3 = setTimeout(() => {
+                if (mounted) {
+                    console.log("[AI Hook] Stage 3/3: Near completion");
+                    setStatusMessage('Almost ready! Finalizing server setup (Stage 3/3)');
+                }
+            }, 120000);
 
             try {
-                if (!spaceId) return;
                 const c = await Client.connect(spaceId);
+                console.log(`[AI Hook] Successfully connected to: ${spaceId}`);
                 if (mounted) {
                     setClient(c);
                     setStatus('ready');
-                    setStatusMessage('');
+                    setStatusMessage('AI System Ready');
                 }
             } catch (err) {
-                console.error("Failed to connect:", spaceId, err);
+                console.error("[AI Hook] Connection failed:", spaceId, err);
                 if (mounted) {
                     setError(err.message || String(err));
                     setStatus('error');
-                    setStatusMessage('Connection failed. Model might be offline.');
+                    setStatusMessage('Connection failed. This tool might be temporarily offline.');
                 }
             }
         }

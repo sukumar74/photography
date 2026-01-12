@@ -104,27 +104,28 @@ function useHuggingFace(spaceId) {
         let t1, t2, t3;
 
         async function connect() {
+            if (!spaceId) return;
+            console.log(`[AI Hook] Connecting to: ${spaceId}`);
             setStatus('loading');
-            setStatusMessage('Connecting to AI Hub...');
+            setStatusMessage('Initializing Hub Connection...');
 
-            t1 = setTimeout(() => { if (mounted) setStatusMessage('Waking up the AI model... (1/3)'); }, 5000);
-            t2 = setTimeout(() => { if (mounted) setStatusMessage('Still waking up... (2/3)'); }, 45000);
-            t3 = setTimeout(() => { if (mounted) setStatusMessage('Hugging Face is busy. Try refreshing if it hangs >3 mins.'); }, 120000);
+            t1 = setTimeout(() => { if (mounted) setStatusMessage('Waking up the AI model... (Stage 1/3)'); }, 5000);
+            t2 = setTimeout(() => { if (mounted) setStatusMessage('Still waking up... Loading AI weights (Stage 2/3)'); }, 45000);
+            t3 = setTimeout(() => { if (mounted) setStatusMessage('Almost ready! Finalizing server setup (Stage 3/3)'); }, 120000);
 
             try {
-                if (!spaceId) return;
                 const c = await Client.connect(spaceId);
                 if (mounted) {
                     setClient(c);
                     setStatus('ready');
-                    setStatusMessage('');
+                    setStatusMessage('AI System Ready');
                 }
             } catch (err) {
                 console.error("Connection error:", spaceId, err);
                 if (mounted) {
                     setError(err.message || String(err));
                     setStatus('error');
-                    setStatusMessage('Connection failed. Model may be private or down.');
+                    setStatusMessage('Connection failed. Model might be offline.');
                 }
             }
         }
@@ -199,11 +200,11 @@ function MagicEditor({ effect }) {
                 const data = response.data[0];
                 setResult(data.url || data.video || data.image || data);
             } else {
-                setError("AI returned an empty result. Try a different prompt.");
+                setError("No result returned. Try a different prompt.");
             }
         } catch (err) {
             console.error(err);
-            setError("Failed to run. Model might be offline or busy.");
+            setError("Model failed or is busy.");
         } finally {
             setLoading(false);
         }
@@ -245,8 +246,8 @@ function MagicEditor({ effect }) {
                     {/* Improved Status Display */}
                     {status !== 'ready' && (
                         <div className="status-badge warn">
-                            {statusMessage || 'Connecting...'}
-                            {statusMessage && statusMessage.includes('Waking') && <div className="loader-line"></div>}
+                            {statusMessage || 'System Connecting...'}
+                            {status === 'loading' && <div className="loader-line"></div>}
                         </div>
                     )}
 
