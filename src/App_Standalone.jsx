@@ -105,30 +105,44 @@ function useHuggingFace(spaceId) {
     const [client, setClient] = useState(null);
     const [status, setStatus] = useState('idle');
     const [error, setError] = useState(null);
+    const [statusMessage, setStatusMessage] = useState('');
 
     useEffect(() => {
         let mounted = true;
+        let timeout;
+
         async function connect() {
             setStatus('loading');
+            setStatusMessage('Connecting to AI...');
+
+            // If it takes more than 5 seconds, it's likely waking up
+            timeout = setTimeout(() => {
+                if (mounted) setStatusMessage('Waking up the AI model (this can take 3 minutes)...');
+            }, 5000);
+
             try {
-                // Ensure spaceId is valid before connecting
                 if (!spaceId) return;
                 console.log("Connecting to space:", spaceId);
                 const c = await Client.connect(spaceId);
                 if (mounted) {
                     setClient(c);
                     setStatus('ready');
+                    setStatusMessage('');
                 }
             } catch (err) {
                 console.error("Failed to connect:", spaceId, err);
                 if (mounted) {
                     setError(err.message || String(err));
                     setStatus('error');
+                    setStatusMessage('Failed to connect. The space might be private or offline.');
                 }
             }
         }
         connect();
-        return () => { mounted = false; };
+        return () => {
+            mounted = false;
+            clearTimeout(timeout);
+        };
     }, [spaceId]);
 
     const predict = async (endpoint, inputs) => {
@@ -136,12 +150,12 @@ function useHuggingFace(spaceId) {
         return await client.predict(endpoint, inputs);
     };
 
-    return { client, status, error, predict };
+    return { client, status, error, predict, statusMessage };
 }
 
 // --- Magic Editor Component ---
 function MagicEditor({ effect }) {
-    const { client, status, predict } = useHuggingFace(effect.modelId);
+    const { client, status, predict, statusMessage } = useHuggingFace(effect.modelId);
     const [inputData, setInputData] = useState(null);
     const [prompt, setPrompt] = useState('');
     const [loading, setLoading] = useState(false);
@@ -222,7 +236,15 @@ function MagicEditor({ effect }) {
                     <button className="btn-run" onClick={handleGenerate} disabled={loading || status !== 'ready' || (!inputData && effect.inputType !== 'text')}>
                         {loading ? <><Loader2 className="spin" /> Processing...</> : <><Wand2 /> Run Magic</>}
                     </button>
-                    {status !== 'ready' && <div className="status-badge warn">Connecting...</div>}
+
+                    {/* Improved Status Display */}
+                    {status !== 'ready' && (
+                        <div className="status-badge warn">
+                            {statusMessage || 'Connecting...'}
+                            {statusMessage.includes('Waking') && <div className="loader-line"></div>}
+                        </div>
+                    )}
+
                     {error && <div className="error-box"><AlertCircle size={16} /> {error}</div>}
                 </div>
                 <div className="output-panel">
@@ -234,6 +256,11 @@ function MagicEditor({ effect }) {
                     ) : <div className="placeholder"><Wand2 size={48} /><span>Result here</span></div>}
                 </div>
             </div>
+            <style>{`
+          .loader-line { width: 100%; height: 2px; background: rgba(255,255,255,0.2); margin-top: 5px; position: relative; overflow: hidden; }
+          .loader-line::after { content: ''; position: absolute; left: 0; top: 0; width: 30%; height: 100%; background: var(--accent); animation: slide 2s infinite linear; }
+          @keyframes slide { 0% { left: -30%; } 100% { left: 100%; } }
+      `}</style>
         </div>
     );
 }

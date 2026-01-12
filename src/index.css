@@ -167,6 +167,39 @@ button {
   border-color: var(--accent);
 }
 
+/* Loading Animation for Cold Start */
+.loader-line {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  margin-top: 5px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.loader-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 30%;
+  height: 100%;
+  background: var(--accent);
+  animation: slide 2s infinite linear;
+  border-radius: 2px;
+}
+
+@keyframes slide {
+  0% {
+    left: -30%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
 .card-icon {
   width: 3rem;
   height: 3rem;

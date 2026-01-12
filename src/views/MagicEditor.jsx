@@ -4,7 +4,7 @@ import { Download, Loader2, Wand2, Upload, AlertCircle } from 'lucide-react';
 import { STYLES } from '../config';
 
 export default function MagicEditor({ effect }) {
-    const { client, status, predict } = useHuggingFace(effect.modelId);
+    const { client, status, predict, statusMessage } = useHuggingFace(effect.modelId);
     const [inputData, setInputData] = useState(null); // Can be text, file, etc.
     const [prompt, setPrompt] = useState('');
     const [loading, setLoading] = useState(false);
@@ -114,7 +114,13 @@ export default function MagicEditor({ effect }) {
                         {loading ? <><Loader2 className="spin" /> Processing...</> : <><Wand2 /> Run Magic</>}
                     </button>
 
-                    {status !== 'ready' && status !== 'loading' && <div className="status-badge warn">Connecting to Model...</div>}
+                    {/* Improved Status Display */}
+                    {status !== 'ready' && (
+                        <div className="status-badge warn">
+                            {statusMessage || 'Connecting...'}
+                            {statusMessage.includes('Waking') && <div className="loader-line"></div>}
+                        </div>
+                    )}
                     {error && <div className="error-box"><AlertCircle size={16} /> {error}</div>}
                 </div>
 
