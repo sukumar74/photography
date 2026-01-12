@@ -41,8 +41,8 @@ export default function App() {
             </nav>
             <main className="main-content">
                 <header className="top-bar">
-                    <h1>Creative Studio</h1>
-                    <div className="status-badge"><Zap size={14} className="icon-zap" /> System Online</div>
+                    <h1>Creative Studio 🚀 v1.3</h1>
+                    <div className="status-badge" style={{ color: '#84cc16' }}><Zap size={14} className="icon-zap" /> System Live</div>
                 </header>
                 <div className="content-area">
                     <EffectCatalog />

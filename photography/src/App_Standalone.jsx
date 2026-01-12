@@ -310,7 +310,7 @@ export default function App() {
                 <div className="nav-items"><button onClick={() => setSelectedEffect(null)} className={!selectedEffect ? 'active' : ''}><Grid size={20} /> All Effects</button></div>
             </nav>
             <main className="main-content">
-                <header className="top-bar"><h1>Creative Studio</h1><div className="status-badge"><Zap size={14} /> Online</div></header>
+                <header className="top-bar"><h1>Creative Studio 🚀 v1.3</h1><div className="status-badge" style={{ color: '#84cc16' }}><Zap size={14} /> System Live</div></header>
                 <div className="content-area">
                     {selectedEffect ? (
                         <div className="catalog-wrapper">
