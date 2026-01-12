@@ -5,7 +5,7 @@ export function useHuggingFace(spaceId) {
     const [client, setClient] = useState(null);
     const [status, setStatus] = useState('idle'); // idle, loading, ready, error
     const [error, setError] = useState(null);
-    const [statusMessage, setStatusMessage] = useState('');
+    const [statusMessage, setStatusMessage] = useState('Contacting AI... (Stage 1/3)');
 
     useEffect(() => {
         let mounted = true;

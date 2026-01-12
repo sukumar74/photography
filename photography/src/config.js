@@ -37,7 +37,36 @@ export const EFFECTS_LIBRARY = [
         defaultPrompt: "slow motion, smooth, high frame rate",
         icon: "Clock"
     },
-
+    {
+        id: "bullet-time",
+        name: "Bullet Time",
+        description: "Frozen orbit effect (Matrix Style).",
+        category: "Effects",
+        modelId: "cerspense/zeroscope_v2_576w",
+        inputType: "video",
+        requiresPrompt: true,
+        defaultPrompt: "bullet time, matrix style, 360 orbit, frozen action",
+        icon: "Zap"
+    },
+    {
+        id: "threed-parallax",
+        name: "3D Parallax",
+        description: "Transform images into 3D video.",
+        category: "Effects",
+        modelId: "Google/zoe-depth",
+        inputType: "image",
+        icon: "Move"
+    },
+    {
+        id: "video-styles",
+        name: "AI Video Styles",
+        description: "Apply Anime, Cyberpunk, etc. to video.",
+        category: "Effects",
+        modelId: "cerspense/zeroscope_v2_576w",
+        inputType: "video",
+        requiresPrompt: true,
+        icon: "Wand2"
+    },
     // --- IMAGE EFFECTS ---
     {
         id: "text-to-image",

@@ -37,6 +37,36 @@ const EFFECTS_LIBRARY = [
         icon: "Clock"
     },
     {
+        id: "bullet-time",
+        name: "Bullet Time",
+        description: "Frozen orbit effect (Matrix Style).",
+        category: "Effects",
+        modelId: "cerspense/zeroscope_v2_576w",
+        inputType: "video",
+        requiresPrompt: true,
+        defaultPrompt: "bullet time, matrix style, 360 orbit, frozen action",
+        icon: "Zap"
+    },
+    {
+        id: "threed-parallax",
+        name: "3D Parallax",
+        description: "Transform images into 3D video.",
+        category: "Effects",
+        modelId: "Google/zoe-depth",
+        inputType: "image",
+        icon: "MoveDiagonal"
+    },
+    {
+        id: "video-styles",
+        name: "AI Video Styles",
+        description: "Apply Anime, Cyberpunk, etc. to video.",
+        category: "Effects",
+        modelId: "cerspense/zeroscope_v2_576w",
+        inputType: "video",
+        requiresPrompt: true,
+        icon: "Wand2"
+    },
+    {
         id: "text-to-image",
         name: "Text to Image",
         description: "FLUX.1 High Quality Generation.",
@@ -97,7 +127,7 @@ function useHuggingFace(spaceId) {
     const [client, setClient] = useState(null);
     const [status, setStatus] = useState('idle');
     const [error, setError] = useState(null);
-    const [statusMessage, setStatusMessage] = useState('');
+    const [statusMessage, setStatusMessage] = useState('Contacting AI... (Stage 1/3)');
 
     useEffect(() => {
         let mounted = true;
@@ -107,11 +137,11 @@ function useHuggingFace(spaceId) {
             if (!spaceId) return;
             console.log(`[AI Hook] Connecting to: ${spaceId}`);
             setStatus('loading');
-            setStatusMessage('Initializing Hub Connection...');
+            setStatusMessage('Connecting AI... (Stage 1/3)');
 
-            t1 = setTimeout(() => { if (mounted) setStatusMessage('Waking up the AI model... (Stage 1/3)'); }, 5000);
-            t2 = setTimeout(() => { if (mounted) setStatusMessage('Still waking up... Loading AI weights (Stage 2/3)'); }, 45000);
-            t3 = setTimeout(() => { if (mounted) setStatusMessage('Almost ready! Finalizing server setup (Stage 3/3)'); }, 120000);
+            t1 = setTimeout(() => { if (mounted) setStatusMessage('Waking up Space... (Stage 2/3)'); }, 3000);
+            t2 = setTimeout(() => { if (mounted) setStatusMessage('Loading AI Weights... (Stage 3/3)'); }, 45000);
+            t3 = setTimeout(() => { if (mounted) setStatusMessage('Almost ready! Finalizing server...'); }, 120000);
 
             try {
                 const c = await Client.connect(spaceId);
@@ -310,7 +340,7 @@ export default function App() {
                 <div className="nav-items"><button onClick={() => setSelectedEffect(null)} className={!selectedEffect ? 'active' : ''}><Grid size={20} /> All Effects</button></div>
             </nav>
             <main className="main-content">
-                <header className="top-bar"><h1>Creative Studio 🚀 v1.3</h1><div className="status-badge" style={{ color: '#84cc16' }}><Zap size={14} /> System Live</div></header>
+                <header className="top-bar"><h1>Creative Studio 🚀 v1.6</h1><div className="status-badge"><Zap size={14} /> System Online</div></header>
                 <div className="content-area">
                     {selectedEffect ? (
                         <div className="catalog-wrapper">
